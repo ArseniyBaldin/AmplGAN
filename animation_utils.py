@@ -1,5 +1,5 @@
 # from dataloader import *
-import numpy as np
+from pennylane import numpy as np
 import matplotlib.pyplot as plt
 
 ax = plt.figure().add_subplot(projection='3d')

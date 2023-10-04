@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import numpy as np
+from pennylane import numpy as np
 import torch
 import torchvision
 import os
@@ -18,31 +18,6 @@ def get_dataset(path):
     # images = images[1:]
     images = images.reshape(1001, -1)
     return images
-
-
-hands = get_dataset('dataset/archive/Hand')
-cxr = get_dataset('dataset/archive/CXR')
-heads = get_dataset('dataset/archive/HeadCT')
-dataset = np.concatenate((hands, cxr, heads), axis=0)
-data_list = list([hands, cxr, heads])
-
-pca = PCA(n_components=PCA_DIM)
-pca.fit(dataset)
-
-hands_pca = pca.transform(hands)
-cxr_pca = pca.transform(cxr)
-heads_pca = pca.transform(heads)
-dataset_pca = np.concatenate((hands_pca, cxr_pca, heads_pca), axis=0)
-data_pca_list = list([hands_pca, cxr_pca, heads_pca])
-
-scaler = MinMaxScaler(feature_range=(-1 / np.sqrt(PCA_DIM), 1 / np.sqrt(PCA_DIM)))
-scaler.fit(dataset_pca)
-
-hands_scaled = scaler.transform(hands_pca)
-cxr_scaled = scaler.transform(cxr_pca)
-heads_scaled = scaler.transform(heads_pca)
-dataset_scaled = np.concatenate((hands_scaled, cxr_scaled, heads_scaled), axis=0)
-data_scaled_list = list([hands_scaled, cxr_scaled, heads_scaled])
 
 
 def translation(data, t=1):
@@ -99,6 +74,21 @@ def inverse_project2sphere(data, t=1):
 
     return (1 - t) * data + t * new_data
 
+if __name__ == '__main__':
+    hands = get_dataset('dataset/archive/Hand')
+    cxr = get_dataset('dataset/archive/CXR')
+    heads = get_dataset('dataset/archive/HeadCT')
+    dataset = np.concatenate((hands, cxr, heads), axis=0)
+    data_list = list([hands, cxr, heads])
 
-aboba = inverse_translation(inverse_stretch(inverse_project2sphere(project2sphere(stretch(translation(dataset_pca))))))
-print(np.sum(np.power(aboba - dataset_pca, 2)))
+    pca = PCA(n_components=PCA_DIM)
+    pca.fit(dataset)
+
+    hands_pca = pca.transform(hands)
+    cxr_pca = pca.transform(cxr)
+    heads_pca = pca.transform(heads)
+    dataset_pca = np.concatenate((hands_pca, cxr_pca, heads_pca), axis=0)
+    data_pca_list = list([hands_pca, cxr_pca, heads_pca])
+
+    scaler = MinMaxScaler(feature_range=(0 / np.sqrt(PCA_DIM), 1 / np.sqrt(PCA_DIM)))
+    scaler.fit(dataset_pca)
