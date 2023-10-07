@@ -4,8 +4,13 @@ from dataloader import *
 from constants import *
 
 
-def make_noise(size=NOISE_SCALE, num=NOISE_SIZE):
-    noise = np.random.normal(1 / (2 * np.sqrt(PCA_DIM)), size / (2 * np.sqrt(PCA_DIM)), size=(num, PCA_DIM))
+def make_noise(scale=NOISE_SCALE, num=NOISE_SIZE):
+    noise = 1 / (2 * np.sqrt(PCA_DIM)) + np.random.normal(0, scale / (2 * np.sqrt(PCA_DIM)), size=(num, PCA_DIM))
     noise = project2sphere(stretch(noise))
-    return noise
+    return torch.tensor(noise)
 
+
+def init_random_variables(length, val, grad=True):
+    par = torch.rand(length) * val
+    par.requires_grad_(grad)
+    return par

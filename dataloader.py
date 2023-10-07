@@ -15,8 +15,8 @@ def get_dataset(path):
     images = np.zeros((1, IMG_SIZE, IMG_SIZE))
     for name in names:
         images = np.concatenate((images, read_image(path + '/' + name)), axis=0)
-    # images = images[1:]
-    images = images.reshape(1001, -1)
+    images = images[1:]
+    images = images.reshape(1000, -1)
     return images
 
 
@@ -28,7 +28,7 @@ def translation(data, t=1):
 
 def inverse_translation(data, t=1):
     transformed_data = scaler.inverse_transform(data)
-#     print("inverse_translation: ", data.shape)
+    #     print("inverse_translation: ", data.shape)
     return (1 - t) * data + t * transformed_data
 
 
@@ -40,7 +40,7 @@ def stretch(data, t=1):
         return trans_data
 
     transformed_data = np.array([transform(sample) for sample in data])
-#     print("stretch: ", data.shape)
+    #     print("stretch: ", data.shape)
     return (1 - t) * data + t * transformed_data
 
 
@@ -55,40 +55,56 @@ def inverse_stretch(data, t=1):
         return trans_data
 
     transformed_data = np.array([transform(sample) for sample in data])
-#     print("inverse_stretch: ", transformed_data.shape)
+    #     print("inverse_stretch: ", transformed_data.shape)
     return (1 - t) * data[:, :-1] + t * transformed_data
 
 
 def project2sphere(data, t=1):
     z_dim = np.sqrt(np.abs(1 - np.sum(np.power(data, 2), axis=1)).reshape(data.shape[0], 1))
     new_data = np.concatenate((data, z_dim), axis=1)
-#     print("project2sphere: ", new_data.shape)
+    #     print("project2sphere: ", new_data.shape)
 
     return (1 - t) * np.concatenate((data, np.zeros(data.shape[0]).reshape(data.shape[0], 1)), axis=1) + t * new_data
 
 
 def inverse_project2sphere(data, t=1):
-    new_data = data.copy()
-    new_data[:, PCA_DIM] = 0
-#     print("inverse_project2sphere: ", new_data.shape)
+    data = torch.tensor(data, requires_grad=False).numpy()
+    try:
+        new_data = data.copy()
+        new_data[:, PCA_DIM] = 0
+    except:
+        new_data = data.copy().reshape(1,-1)
+        new_data[:, PCA_DIM] = 0
+
+    #print("inverse_project2sphere: ", new_data.shape)
 
     return (1 - t) * data + t * new_data
 
-if __name__ == '__main__':
-    hands = get_dataset('dataset/archive/Hand')
-    cxr = get_dataset('dataset/archive/CXR')
-    heads = get_dataset('dataset/archive/HeadCT')
-    dataset = np.concatenate((hands, cxr, heads), axis=0)
-    data_list = list([hands, cxr, heads])
 
-    pca = PCA(n_components=PCA_DIM)
-    pca.fit(dataset)
+hands = get_dataset('dataset/archive/Hand')
+cxr = get_dataset('dataset/archive/CXR')
+heads = get_dataset('dataset/archive/HeadCT')
+dataset = np.concatenate((hands, cxr, heads), axis=0)
+data_list = list([hands, cxr, heads])
+pca = PCA(n_components=PCA_DIM)
+pca.fit(dataset)
 
-    hands_pca = pca.transform(hands)
-    cxr_pca = pca.transform(cxr)
-    heads_pca = pca.transform(heads)
-    dataset_pca = np.concatenate((hands_pca, cxr_pca, heads_pca), axis=0)
-    data_pca_list = list([hands_pca, cxr_pca, heads_pca])
+hands_pca = pca.transform(hands)
+cxr_pca = pca.transform(cxr)
+heads_pca = pca.transform(heads)
+dataset_pca = np.concatenate((hands_pca, cxr_pca, heads_pca), axis=0)
+# data_pca_list = list([hands_pca, cxr_pca, heads_pca])
+# print(cxr_pca)
+scaler = MinMaxScaler(feature_range=(0 / np.sqrt(PCA_DIM), 1 / np.sqrt(PCA_DIM)))
+scaler.fit(dataset_pca)
 
-    scaler = MinMaxScaler(feature_range=(0 / np.sqrt(PCA_DIM), 1 / np.sqrt(PCA_DIM)))
-    scaler.fit(dataset_pca)
+hands_ampl = project2sphere(stretch(translation(hands_pca)))[0].reshape(1,-1)
+cxr_ampl = project2sphere(stretch(translation(cxr_pca)))[0].reshape(1,-1)
+heads_ampl = project2sphere(stretch(translation(heads_pca)))[0].reshape(1,-1)
+dataset_ampl = np.concatenate((hands_ampl, cxr_ampl, heads_ampl), axis=1)
+ampl_list = list([hands_ampl, cxr_ampl, heads_ampl])
+
+# aboba = pca.inverse_transform(inverse_translation(inverse_stretch(inverse_project2sphere(hands_ampl[2])))).reshape(IMG_SIZE,IMG_SIZE)
+# plt.imshow(aboba)
+# plt.savefig("gen_med/image-{}-{}".format("_", "_"))
+# plt.clf()

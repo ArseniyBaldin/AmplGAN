@@ -1,11 +1,17 @@
 from pennylane import numpy as np
 
 IMG_SIZE = 64
-PCA_DIM = 2
-N_dim = PCA_DIM
-N_a = 2
-DEPTH = 2
+PCA_DIM = 511
+N_dim = 9
+N_a = 0
+DEPTH = 8
 NUM_LAYER_WEIGHTS = 3 * (N_a + N_dim) - 1
 NUM_DEEP_LAYER_WEIGHTS = NUM_LAYER_WEIGHTS * DEPTH
-NOISE_SCALE = 0.05
-NOISE_SIZE = 100
+NOISE_SCALE = 0
+NOISE_SIZE = 1
+LEARNING_RATE = 0.005
+NUM_EPOCHS = 10000
+BATCH_SIZE = 1
+A = 1
+B = 0
+C = 1
