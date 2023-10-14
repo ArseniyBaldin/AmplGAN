@@ -14,4 +14,4 @@ NUM_EPOCHS = 10000
 BATCH_SIZE = 1
 A = 1
 B = 0
-C = 1
+C = 3
