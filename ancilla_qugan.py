@@ -37,9 +37,9 @@ ampl_list = list([hands_ampl, cxr_ampl, heads_ampl])
 
 noise = make_noise()
 
-# disc_weights = init_random_variables(NUM_DEEP_LAYER_WEIGHTS, np.pi/2)
-# gen_weights = init_random_variables(NUM_DEEP_LAYER_WEIGHTS, np.pi/2)
-disc_weights, gen_weights = load_weights(0, 1389, 0)
+disc_weights = init_random_variables(NUM_DEEP_LAYER_WEIGHTS, np.pi/2)
+gen_weights = init_random_variables(NUM_DEEP_LAYER_WEIGHTS, np.pi/2)
+# disc_weights, gen_weights = load_weights(0, 1389, 0)
 
 criterion = nn.BCELoss()
 disc_optimizer = torch.optim.AdamW([disc_weights], lr=LEARNING_RATE, betas=(0.5, 0.999))
