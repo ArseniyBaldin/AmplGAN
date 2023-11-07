@@ -20,13 +20,13 @@ def get_dataset(path):
     return images
 
 
-def translation(data, t=1):
+def translation(data, scaler, t=1):
     transformed_data = scaler.transform(data)
     # print("translation: ", data.shape)
     return (1 - t) * data + t * transformed_data
 
 
-def inverse_translation(data, t=1):
+def inverse_translation(data, scaler, t=1):
     transformed_data = scaler.inverse_transform(data)
     #     print("inverse_translation: ", data.shape)
     return (1 - t) * data + t * transformed_data
@@ -79,30 +79,6 @@ def inverse_project2sphere(data, t=1):
     #print("inverse_project2sphere: ", new_data.shape)
 
     return (1 - t) * data + t * new_data
-
-
-hands = get_dataset('dataset/archive/Hand')
-cxr = get_dataset('dataset/archive/CXR')
-heads = get_dataset('dataset/archive/HeadCT')
-dataset = np.concatenate((hands, cxr, heads), axis=0)
-data_list = list([hands, cxr, heads])
-pca = PCA(n_components=PCA_DIM)
-pca.fit(dataset)
-
-hands_pca = pca.transform(hands)
-cxr_pca = pca.transform(cxr)
-heads_pca = pca.transform(heads)
-dataset_pca = np.concatenate((hands_pca, cxr_pca, heads_pca), axis=0)
-# data_pca_list = list([hands_pca, cxr_pca, heads_pca])
-# print(cxr_pca)
-scaler = MinMaxScaler(feature_range=(0 / np.sqrt(PCA_DIM), 1 / np.sqrt(PCA_DIM)))
-scaler.fit(dataset_pca)
-
-hands_ampl = project2sphere(stretch(translation(hands_pca)))[0].reshape(1,-1)
-cxr_ampl = project2sphere(stretch(translation(cxr_pca)))[0].reshape(1,-1)
-heads_ampl = project2sphere(stretch(translation(heads_pca)))[0].reshape(1,-1)
-dataset_ampl = np.concatenate((hands_ampl, cxr_ampl, heads_ampl), axis=1)
-ampl_list = list([hands_ampl, cxr_ampl, heads_ampl])
 
 # aboba = pca.inverse_transform(inverse_translation(inverse_stretch(inverse_project2sphere(hands_ampl[2])))).reshape(IMG_SIZE,IMG_SIZE)
 # plt.imshow(aboba)
