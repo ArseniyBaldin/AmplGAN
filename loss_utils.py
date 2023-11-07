@@ -13,7 +13,7 @@ def batch_real_loss(disc_weights, batch):
 def Batch_real_loss(disc_weights, batch):
     # print(batch.shape)
     a = train_on_real(disc_weights, batch)
-    cost = torch.pow(torch.mean(torch.log(1 - a)), 9)
+    cost = torch.pow(torch.mean(torch.log(1 - a)), 3)
     # fig, ax = qml.draw_mpl(Train_on_real)(disc_weights, batch)
     # fig.show()
     print("Real: ", a.item())
@@ -22,7 +22,7 @@ def Batch_real_loss(disc_weights, batch):
 
 def Batch_fake_loss(disc_weights, gen_weights, batch):
     a = train_on_fake(disc_weights, gen_weights, batch)
-    cost = torch.pow(torch.mean(torch.log(a)), 9)
+    cost = torch.pow(torch.mean(torch.log(a)), 3)
     # fig, ax = qml.draw_mpl(Train_on_fake)(disc_weights, gen_weights, batch)
     # fig.show()
     print("Fake: ", a.item())
@@ -31,7 +31,7 @@ def Batch_fake_loss(disc_weights, gen_weights, batch):
 
 def Batch_gen_loss(disc_weights, gen_weights, batch):
     a = train_on_fake(disc_weights, gen_weights, batch)
-    cost = torch.pow(torch.mean(torch.log(1 - a)), 9)
+    cost = torch.pow(torch.mean(torch.log(1 - a)), 3)
     #     # fig, ax = qml.draw_mpl(train_on_fake)(disc_weights, gen_weights, batch)
     #     # fig.show()
     print("Gen: ", a.item())
