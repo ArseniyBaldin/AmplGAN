@@ -49,7 +49,7 @@ gen_optimizer = torch.optim.AdamW([gen_weights], lr=LEARNING_RATE, betas=(0.5, 0
 
 def train_amplitude():
     for num_cls, cls in enumerate(ampl_list):
-        train_data = torch.utils.data.DataLoader(cls, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
+        train_data = torch.utils.data.DataLoader(cls, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
         for epoch in range(NUM_EPOCHS):
 
             print(epoch)
