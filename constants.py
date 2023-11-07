@@ -1,8 +1,8 @@
 from pennylane import numpy as np
 
 IMG_SIZE = 64
-PCA_DIM = 511
-N_dim = 9
+PCA_DIM = 255
+N_dim = 8
 N_a = 0
 DEPTH = 20
 NUM_LAYER_WEIGHTS = 3 * (N_a + N_dim) - 1
