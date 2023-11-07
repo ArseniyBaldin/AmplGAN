@@ -52,6 +52,8 @@ def train_amplitude():
         train_data = torch.utils.data.DataLoader(cls, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
         for epoch in range(NUM_EPOCHS):
 
+            print(epoch)
+
             for batch_idx, batch in enumerate(train_data):
 
                 # print(batch)
