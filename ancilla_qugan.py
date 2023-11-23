@@ -11,29 +11,30 @@ import torch.nn as nn
 import torch.nn.utils as torch_utils
 
 
-hands = get_dataset('dataset/archive/Hand')
-cxr = get_dataset('dataset/archive/CXR')
-heads = get_dataset('dataset/archive/HeadCT')
-dataset = np.concatenate((hands, cxr, heads), axis=0)
-data_list = list([hands, cxr, heads])
+# hands = get_dataset('dataset/archive/Hand')
+# cxr = get_dataset('dataset/archive/CXR')
+# heads = get_dataset('dataset/archive/HeadCT')
+# dataset = np.concatenate((hands, cxr, heads), axis=0)
+# data_list = list([hands, cxr, heads])
+dataset = get_dataset('dataset/archive(1)/out2')
 pca = PCA(n_components=PCA_DIM)
 pca.fit(dataset)
-
-hands_pca = pca.transform(hands)
-cxr_pca = pca.transform(cxr)
-heads_pca = pca.transform(heads)
-dataset_pca = np.concatenate((hands_pca, cxr_pca, heads_pca), axis=0)
+dataset_pca = pca.transform(dataset)
+# hands_pca = pca.transform(hands)
+# cxr_pca = pca.transform(cxr)
+# heads_pca = pca.transform(heads)
+# dataset_pca = np.concatenate((hands_pca, cxr_pca, heads_pca), axis=0)
 # data_pca_list = list([hands_pca, cxr_pca, heads_pca])
 # print(cxr_pca)
 scaler = MinMaxScaler(feature_range=(0 / np.sqrt(PCA_DIM), 1 / np.sqrt(PCA_DIM)))
 scaler.fit(dataset_pca)
 
-hands_ampl = project2sphere(stretch(translation(hands_pca, scaler)))[0].reshape(1,-1)
-cxr_ampl = project2sphere(stretch(translation(cxr_pca, scaler)))[0].reshape(1,-1)
-heads_ampl = project2sphere(stretch(translation(heads_pca, scaler)))[0].reshape(1,-1)
-dataset_ampl = np.concatenate((hands_ampl, cxr_ampl, heads_ampl), axis=1)
-ampl_list = list([hands_ampl, cxr_ampl, heads_ampl])
-
+# hands_ampl = project2sphere(stretch(translation(hands_pca, scaler)))[0].reshape(1,-1)
+# cxr_ampl = project2sphere(stretch(translation(cxr_pca, scaler)))[0].reshape(1,-1)
+# heads_ampl = project2sphere(stretch(translation(heads_pca, scaler)))[0].reshape(1,-1)
+# dataset_ampl = np.concatenate((hands_ampl, cxr_ampl, heads_ampl), axis=1)
+# ampl_list = list([hands_ampl, cxr_ampl, heads_ampl])
+dataset_ampl = project2sphere(stretch(translation(dataset_pca, scaler)))[0].reshape(1,-1)
 
 noise = make_noise()
 
@@ -48,7 +49,7 @@ gen_optimizer = torch.optim.AdamW([gen_weights], lr=LEARNING_RATE, betas=(0.5, 0
 
 
 def train_amplitude():
-    for num_cls, cls in enumerate(ampl_list):
+    for num_cls, cls in enumerate(dataset_ampl):
         train_data = torch.utils.data.DataLoader(cls, batch_size=BATCH_SIZE, shuffle=False, num_workers=4)
         for epoch in range(NUM_EPOCHS):
 
@@ -67,7 +68,7 @@ def train_amplitude():
                 sample = inverse_translation(inverse_stretch(inverse_project2sphere(sample)), scaler)
                 sample = pca.inverse_transform(sample.reshape(1, -1)).reshape(64, 64)
                 plt.imshow(sample, origin='lower', cmap='gray')
-                plt.savefig("gen_med/image-{}-{}".format(epoch, batch_idx))
+                plt.savefig("gen_animeee/image-{}-{}".format(epoch, batch_idx))
                 plt.clf()
 
                 for iter in range(A):
